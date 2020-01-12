@@ -19,7 +19,7 @@ def random_key():
 def create_user(account, password):
 
     duplicate = False
-    with open(os.getcwd() + '/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['account'] == account:
@@ -36,7 +36,7 @@ def create_user(account, password):
             'online': False
         })
 
-        with open(os.getcwd() + '/data/user.json', 'w') as fp:
+        with open(os.getcwd() + '/src/data/user.json', 'w') as fp:
             json.dump(data, fp)
             fp.close()
 
@@ -51,7 +51,7 @@ def create_user(account, password):
 def delete_user(account, password):
 
     deleted = False
-    with open(os.getcwd() + '/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
         data = json.load(fp)
         ic = 0
         for tmp in data['user']:
@@ -65,7 +65,7 @@ def delete_user(account, password):
 
     if deleted:
 
-        with open(os.getcwd() + '/data/user.json', 'w') as fp:
+        with open(os.getcwd() + '/src/data/user.json', 'w') as fp:
             json.dump(data, fp)
             fp.close()
 
@@ -82,7 +82,7 @@ def log_in(account, password):
 
     authorized = False
     key = ''
-    with open(os.getcwd() + '/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['account'] == account \
@@ -96,7 +96,7 @@ def log_in(account, password):
 
     if authorized:
 
-        with open(os.getcwd() + '/data/user.json', 'w') as fp:
+        with open(os.getcwd() + '/src/data/user.json', 'w') as fp:
             json.dump(data, fp)
             fp.close()
 
@@ -107,14 +107,14 @@ def log_in(account, password):
 
 def log_out(key):
 
-    with open(os.getcwd() + '/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['key'] == key:
                 tmp['online'] = False
         fp.close()
 
-    with open(os.getcwd() + '/data/user.json', 'w') as fp:
+    with open(os.getcwd() + '/src/data/user.json', 'w') as fp:
             json.dump(data, fp)
             fp.close()
 
