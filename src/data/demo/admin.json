@@ -1,0 +1,1 @@
+{"message": [{"timestamp": "2019-11-30 16:36:01", "content": "test123", "direction": "out ", "read": true}, {"timestamp": "2019-11-30 16:36:11", "content": "test 456 789", "direction": "out ", "read": true}, {"timestamp": "2019-11-30 16:36:37", "content": "[file]123.txt", "direction": "out ", "read": true}]}
