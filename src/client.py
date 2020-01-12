@@ -8,7 +8,9 @@ import socket
 import getpass
 import urllib.request
 
-server_ip = '140.112.30.125'
+from inc.cryptography import *
+
+server_ip = '127.0.0.1'
 port = 12789
 max_length = 4096
 wait_second = 10
@@ -23,11 +25,20 @@ except:
 current_key = 'none'
 
 def signal_handler(sig, frame):
-        client.send((current_key + ' logout').encode())
-        client.send((current_key + ' exit').encode())
+        encrypt_send( (current_key + ' logout'), u_publicKey, client)
+        encrypt_send( (current_key + ' exit'), u_publicKey, client)
         client.close()
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
+
+
+#key generation
+me_privateKey, me_publicKey = key_generation()
+#public key exchange
+u_public_string = ( client.recv( max_length))
+u_publicKey = RSA.importKey( u_public_string)
+
+client.send( me_publicKey.exportKey())
 
 while True:
     
@@ -43,7 +54,7 @@ while True:
 
     while network_availability == False:
         try:
-            urllib.request.urlopen('https://google.com')
+            #urllib.request.urlopen('https://google.com')
             network_availability = True
         except urllib.request.URLError as err:
             print('network is unreachable...')
@@ -68,7 +79,7 @@ while True:
             continue
 
     if sendable:
-        client.send((current_key + ' ' + msg).encode())
+        encrypt_send( (current_key + ' ' + msg), u_publicKey, client)
 
     if msg.split()[0] == 'exit':
         print('bye')
@@ -81,16 +92,16 @@ while True:
         if msg.split()[1] == 'file':
             for ic in range(3, len(msg.split()), 1):
                 if os.path.isfile(msg.split()[ic]):
-                    buf = (client.recv(max_length)).decode()
+                    buf = receive_decode( me_privateKey, client, max_length)
                     bound = int(os.path.getsize(msg.split()[ic]))
-                    client.send(('ok ' + str(bound)).encode())
+                    encrypt_send( ('ok' + str(bound)), u_publicKey, client)
                     with open(msg.split()[ic], 'rb') as fp:
-                        buf = (client.recv(max_length)).decode()
+                        buf = receive_decode( me_privateKey, client, max_length)
                         if buf == 'ok':
                             buf = fp.read(max_length)
-                            client.send(buf)
+                            encrypte_send( buf, u_publicKey, client)
                             for j in range(bound):
-                                tmp = (client.recv(max_length)).decode()
+                                tmp = receive_decode( me_privateKey, client, max_length)
                                 is_end  = False
                                 for k in tmp.split():
                                     print(k)
@@ -100,23 +111,23 @@ while True:
                                 if is_end:
                                     break
                                 buf = fp.read(max_length)
-                                client.send(buf)
+                                encrypte_send( buf, u_publicKey, client)
                         fp.close()
-                    buf = (client.recv(max_length)).decode()
+                    buf = receive_decode( me_privateKey, client, max_length)
                     if ic != len(msg.split())-1:
-                        client.send(('next').encode())
+                        encrypte_send( ('next'), u_publicKey, client)
                     print(buf)
                 else:
                     if sendable:
-                        buf = (client.recv(max_length)).decode()
-                        client.send(('error').encode())
+                        buf = receive_decode( me_privateKey, client, max_length)
+                        encrypte_send( ('error'), u_publicKey, client)
                     print(msg.split()[ic], ' not exists')
             continue
 
     elif msg.split()[0] == 'get' and (len(msg.split()) >= 2):
         if msg.split()[1] == 'file':
             for ic in range(3, len(msg.split()), 1):
-                buf = (client.recv(max_length)).decode()
+                buf = receive_decode( me_privateKey, client, max_length)
                 if buf.split()[0] == 'ok':
                     save_path = msg.split()[ic]
                     for index in range(1, 65536, 1):
@@ -125,27 +136,27 @@ while True:
                         save_path = msg.split()[ic].split('.')[0] \
                                 + '(' + str(index) + ').' + msg.split()[ic].split('.')[1]
                         
-                    client.send(('ok').encode())
+                    encrypte_send( ('ok'), u_publicKey, client)
                     bound = int(buf.split()[1])
                     size_sum = 0
                     with open(save_path, 'wb') as fp:
-                        buf = client.recv(max_length)
+                        buf = receive_decode( me_privateKey, client, max_length)
                         size_sum += len(buf)
                         while True:
                             fp.write(buf)
-                            client.send((str(size_sum) + ' ').encode())
+                            encrypte_send( (str(size_sum) + ' ' ), u_publicKey, client)
                             if size_sum == bound:
                                 break
-                            buf = client.recv(max_length)
+                            buf = receive_decode( me_privateKey, client, max_length)
                             size_sum += len(buf)
                         fp.close()
-                buf = (client.recv(max_length)).decode()
+                buf = receive_decode( me_privateKey, client, max_length)
                 if ic != len(msg.split())-1:
-                    client.send(('next').encode())
+                    encrypte_send( ('next'), u_publicKey, client)
                 print(buf)
             continue
 
-    buf = (client.recv(max_length)).decode()
+    buf = receive_decode( me_privateKey, client, max_length)
 
     if msg.split()[0] == 'login' and len(buf) == 32:
         current_key = buf

@@ -14,7 +14,7 @@ def show_all(key):
     max_length = 4096
     current_account = ''
     authorized = False
-    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['key'] == key:
@@ -49,7 +49,7 @@ def get_text(key, person, search):
 
     authorized = False
     person_found = False
-    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['key'] == key:
@@ -114,7 +114,7 @@ def get_file(key, person, file_path, conn):
     authorized = False
     person_found = False
     file_found = False
-    with open(os.getcwd() + '/src/data/user.json', 'r') as fp:
+    with open(os.getcwd() + '/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
             if tmp['key'] == key:
