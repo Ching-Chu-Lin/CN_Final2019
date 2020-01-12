@@ -7,8 +7,8 @@ CN Final 2019
 For the setup:
 
 ```bash
-git clone https://github.com/hc07180011/mainpage.git
-cd mainpage/2019_CN_Final/
+git clone https://github.com/Ching-Chu-Lin/CN_Final2019.git 
+cd 2019_CN_Final/
 ```
 
 Run:
