@@ -25,6 +25,8 @@ reg [account] [password]
 chg [account] [pasword] [new password]
 login [account] [password]
 logout
+#List
+show
 #Send
 send [text] [receiver] [content]
 send [file] [receiver] [[content1] [content2]...] # available when receiver online
@@ -56,3 +58,6 @@ you have logged out
 * Message Status
 * Change Password
 * Race Condition Avoid
+* Password hiding
+* List latest message for each user
+* Encryption
