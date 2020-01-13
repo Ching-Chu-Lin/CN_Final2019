@@ -19,7 +19,7 @@ from inc.super_user import sudo
 from inc.cryptography import *
 
 listen_ip = '0.0.0.0'
-port = 12789
+port = 12788
 max_length = 4096
 max_client = 64
 clien_cnt = 0
@@ -69,17 +69,17 @@ while True:
                 msg = sudo(buf)
             elif buf.split()[1] == 'reg':
                 if len(buf.split()) < 4:
-                    msg = '[reg] [account] [password]'
+                    msg = 'Usage: [reg] [account] [password]'
                 else:
                     msg = create_user(buf.split()[2], buf.split()[3])
             elif buf.split()[1] == 'chg':
-                if len(buf.split()) < 5:
-                    msg = '[chg] [account] [pasword] [new password]'
+                if len(buf.split()) < 5: 
+                    msg = 'Usage: [chg] [account] [pasword] [new password] [new password confirm]'
                 else:
                     msg = change_password(buf.split()[2], buf.split()[3], buf.split()[4])
             elif buf.split()[1] == 'login':
                 if len(buf.split()) < 4:
-                    msg = '[login] [account] [password]'
+                    msg = 'Usage: [login] [account] [password]'
                 else:
                     msg = log_in(buf.split()[2], buf.split()[3])
             elif buf.split()[1] == 'logout':
@@ -88,7 +88,7 @@ while True:
                 msg = show_all(buf.split()[0])
             elif buf.split()[1] == 'send':
                 if len(buf.split()) < 5 or (buf.split()[2] != 'text' and buf.split()[2] != 'file'):
-                    msg = '[send] [text] [receiver] [content]\n[send] [file] [receiver] [content1] [content2]...'
+                    msg = 'Usage: [send] [text] [receiver] [content]\n[send] [file] [receiver] [content1] [content2]...'
                 else:
                     if buf.split()[2] == 'text':
                         msg = send_text(buf.split()[0], buf.split()[3], str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), shlex.split(buf)[4])
@@ -105,7 +105,7 @@ while True:
                         continue
             elif buf.split()[1] == 'get':
                 if len(buf.split()) < 5:
-                    msg = '[get] [text or file] [person] [ret_type]'
+                    msg = 'Usage: [get] [text or file] [person] [ret_type]'
                 else:
                     if buf.split()[2] == 'text':
                         msg = get_text(buf.split()[0], buf.split()[3], buf.split()[4])
@@ -118,7 +118,7 @@ while True:
                                 tmp = ( receive_decode( me_privateKey, conn, max_length))
                         continue
             else:
-                msg = 'undefined command!'
+                msg = 'Error: undefined command!'
 
             print('msg:\n', msg)
             encrypt_send( msg, u_publicKey, conn)

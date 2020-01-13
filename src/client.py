@@ -11,7 +11,7 @@ import urllib.request
 from inc.cryptography import *
 
 server_ip = '127.0.0.1'
-port = 12789
+port = 12788
 max_length = 4096
 wait_second = 10
 
@@ -46,9 +46,9 @@ while True:
     msg = input('')
 
     if msg.split()[0] == 'login':
-        print('Username:', end=' ')
+        print('Username:', end='')
         msg = msg + ' ' + input('')
-        msg = msg + ' ' + getpass.getpass(prompt='password')
+        msg = msg + ' ' + getpass.getpass(prompt='password:')
 
     network_availability = False
 
@@ -75,8 +75,22 @@ while True:
 
     if msg.split()[0] == 'get':
         if len(msg.split()) < 4:
-            print('[get] [text or file] [person] [content]')
+            print('Usage: [get] [text or file] [person] [content]')
             continue
+
+
+    if msg.split()[0] == 'chg':
+        if len(msg.split()) != 2:
+            print('Usage: [chg] [account]')
+            sendable = False
+            continue
+        else:
+            msg = msg + ' ' + getpass.getpass(prompt='password:')
+            confirmaion = getpass.getpass(prompt='password confirm:')
+            if msg.split()[4] != confirmation:
+                print('ERROR: Your password and confirmation password do not match. Request has been ignored.')
+                sendable = False
+                continue
 
     if sendable:
         encrypt_send( (current_key + ' ' + msg), u_publicKey, client)
@@ -84,6 +98,7 @@ while True:
     if msg.split()[0] == 'exit':
         print('bye')
         break
+
 
     elif msg.split()[0] == 'logout':
         current_key = 'none'
