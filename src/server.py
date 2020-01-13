@@ -5,6 +5,8 @@ import socket
 import signal
 import datetime
 import shlex
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 
 from inc.account import create_user
 from inc.account import change_password
@@ -19,7 +21,7 @@ from inc.super_user import sudo
 from inc.cryptography import *
 
 listen_ip = '0.0.0.0'
-port = 12788
+port = 12789
 max_length = 4096
 max_client = 64
 clien_cnt = 0
@@ -43,17 +45,20 @@ while True:
     if os.fork() == 0:
 
         #key generation
-        me_privateKey, me_publicKey = key_generation()
-        #public key exchange
+        me_privateKey, me_publicKey = asymmetric_key_generation()
         conn.send( me_publicKey.exportKey())
+        #asymmetric key exchange
+        #save key class
+        data = conn.recv( max_length)
+        cipher = PKCS1_OAEP.new( me_privateKey)
+        symmetricKey = cipher.decrypt( data)
+        print('sym at server:', symmetricKey)
 
-        u_public_string = ( conn.recv( max_length))
-        u_publicKey = RSA.importKey( u_public_string)
 
 
         while True:
 
-            buf = receive_decode( me_privateKey, conn, max_length)
+            buf = receive_decode( symmetricKey, conn, max_length)
 
             print('-==================================')
             print('-', buf, '-')
@@ -94,14 +99,14 @@ while True:
                         msg = send_text(buf.split()[0], buf.split()[3], str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), shlex.split(buf)[4])
                     else:
                         for ic in range(4, len(shlex.split(buf)), 1):
-                            encrypt_send( ('ok'), u_publicKey, conn)
-                            tmp = ( receive_decode( me_privateKey, conn, max_length))
+                            encrypt_send( ('ok'), symmetricKey, conn)
+                            tmp = ( receive_decode( symmetricKey, conn, max_length))
                             if tmp.split()[0] == 'ok':
                                 msg = send_file(buf.split()[0], buf.split()[3], str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), shlex.split(buf)[ic], conn, int(tmp.split()[1]))
                                 print('msg:\n', msg)
-                                encrypt_send( msg, u_publicKey, conn)
+                                encrypt_send( msg, symmetricKey, conn)
                                 if ic != len(shlex.split(buf))-1:
-                                    tmp = ( receive_decode( me_privateKey, conn, max_length))
+                                    tmp = ( receive_decode( symmetricKey, conn, max_length))
                         continue
             elif buf.split()[1] == 'get':
                 if len(buf.split()) < 5:
@@ -113,13 +118,13 @@ while True:
                         for ic in range(4, len(buf.split()), 1):
                             msg = get_file(buf.split()[0], buf.split()[3], buf.split()[ic], conn)
                             print('msg:\n', msg)
-                            encrypt_send( msg, u_publicKey, conn)
+                            encrypt_send( msg, symmetricKey, conn)
                             if ic != len(buf.split())-1:
-                                tmp = ( receive_decode( me_privateKey, conn, max_length))
+                                tmp = ( receive_decode( symmetricKey, conn, max_length))
                         continue
             else:
                 msg = 'Error: undefined command!'
 
             print('msg:\n', msg)
-            encrypt_send( msg, u_publicKey, conn)
+            encrypt_send( msg, symmetricKey, conn)
     conn.close()

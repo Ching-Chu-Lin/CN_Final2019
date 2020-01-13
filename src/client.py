@@ -7,11 +7,14 @@ import signal
 import socket
 import getpass
 import urllib.request
+from Crypto.Cipher import PKCS1_OAEP
+from cryptography.fernet import Fernet
+from Crypto.PublicKey import RSA
 
 from inc.cryptography import *
 
 server_ip = '127.0.0.1'
-port = 12788
+port = 12789
 max_length = 4096
 wait_second = 10
 
@@ -25,20 +28,26 @@ except:
 current_key = 'none'
 
 def signal_handler(sig, frame):
-        encrypt_send( (current_key + ' logout'), u_publicKey, client)
-        encrypt_send( (current_key + ' exit'), u_publicKey, client)
+        encrypt_send( (current_key + ' logout'), symmetricKey, client)
+        encrypt_send( (current_key + ' exit'), symmetricKey, client)
         client.close()
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
 
-#key generation
-me_privateKey, me_publicKey = key_generation()
-#public key exchange
-u_public_string = ( client.recv( max_length))
-u_publicKey = RSA.importKey( u_public_string)
+#asymmetric key exchange
+#get your public key
+u_publicKey = RSA.importKey( client.recv( max_length))
+#save key class
+#send fernet key
+symmetricKey = Fernet.generate_key()
+cipher = PKCS1_OAEP.new( u_publicKey)
+encrypted = cipher.encrypt( symmetricKey)
+client.send( encrypted)
+print('sym at client:', symmetricKey)
 
-client.send( me_publicKey.exportKey())
+
+
 
 while True:
     
@@ -101,7 +110,7 @@ while True:
                 
 
     if sendable:
-        encrypt_send( (current_key + ' ' + msg), u_publicKey, client)
+        encrypt_send( (current_key + ' ' + msg), symmetricKey, client)
 
     if msg.split()[0] == 'exit':
         print('bye')
@@ -115,16 +124,16 @@ while True:
         if msg.split()[1] == 'file':
             for ic in range(3, len(msg.split()), 1):
                 if os.path.isfile(msg.split()[ic]):
-                    buf = receive_decode( me_privateKey, client, max_length)
+                    buf = receive_decode( symmetricKey, client, max_length)
                     bound = int(os.path.getsize(msg.split()[ic]))
-                    encrypt_send( ('ok' + str(bound)), u_publicKey, client)
+                    encrypt_send( ('ok' + str(bound)), symmetricKey, client)
                     with open(msg.split()[ic], 'rb') as fp:
-                        buf = receive_decode( me_privateKey, client, max_length)
+                        buf = receive_decode( symmetricKey, client, max_length)
                         if buf == 'ok':
                             buf = fp.read(max_length)
-                            encrypte_send( buf, u_publicKey, client)
+                            encrypte_send( buf, symmetricKey, client)
                             for j in range(bound):
-                                tmp = receive_decode( me_privateKey, client, max_length)
+                                tmp = receive_decode( symmetricKey, client, max_length)
                                 is_end  = False
                                 for k in tmp.split():
                                     print(k)
@@ -134,23 +143,23 @@ while True:
                                 if is_end:
                                     break
                                 buf = fp.read(max_length)
-                                encrypte_send( buf, u_publicKey, client)
+                                encrypte_send( buf, symmetricKey, client)
                         fp.close()
-                    buf = receive_decode( me_privateKey, client, max_length)
+                    buf = receive_decode( symmetricKey, client, max_length)
                     if ic != len(msg.split())-1:
-                        encrypte_send( ('next'), u_publicKey, client)
+                        encrypte_send( ('next'), symmetricKey, client)
                     print(buf)
                 else:
                     if sendable:
-                        buf = receive_decode( me_privateKey, client, max_length)
-                        encrypte_send( ('error'), u_publicKey, client)
+                        buf = receive_decode( symmetricKey, client, max_length)
+                        encrypte_send( ('error'), symmetricKey, client)
                     print(msg.split()[ic], ' not exists')
             continue
 
     elif msg.split()[0] == 'get' and (len(msg.split()) >= 2):
         if msg.split()[1] == 'file':
             for ic in range(3, len(msg.split()), 1):
-                buf = receive_decode( me_privateKey, client, max_length)
+                buf = receive_decode( symmetricKey, client, max_length)
                 if buf.split()[0] == 'ok':
                     save_path = msg.split()[ic]
                     for index in range(1, 65536, 1):
@@ -159,27 +168,27 @@ while True:
                         save_path = msg.split()[ic].split('.')[0] \
                                 + '(' + str(index) + ').' + msg.split()[ic].split('.')[1]
                         
-                    encrypte_send( ('ok'), u_publicKey, client)
+                    encrypte_send( ('ok'), symmetricKey, client)
                     bound = int(buf.split()[1])
                     size_sum = 0
                     with open(save_path, 'wb') as fp:
-                        buf = receive_decode( me_privateKey, client, max_length)
+                        buf = receive_decode( symmetricKey, client, max_length)
                         size_sum += len(buf)
                         while True:
                             fp.write(buf)
-                            encrypte_send( (str(size_sum) + ' ' ), u_publicKey, client)
+                            encrypte_send( (str(size_sum) + ' ' ), symmetricKey, client)
                             if size_sum == bound:
                                 break
-                            buf = receive_decode( me_privateKey, client, max_length)
+                            buf = receive_decode( symmetricKey, client, max_length)
                             size_sum += len(buf)
                         fp.close()
-                buf = receive_decode( me_privateKey, client, max_length)
+                buf = receive_decode( symmetricKey, client, max_length)
                 if ic != len(msg.split())-1:
-                    encrypte_send( ('next'), u_publicKey, client)
+                    encrypte_send( ('next'), symmetricKey, client)
                 print(buf)
             continue
 
-    buf = receive_decode( me_privateKey, client, max_length)
+    buf = receive_decode( symmetricKey, client, max_length)
 
     if msg.split()[0] == 'login' and len(buf) == 32:
         current_key = buf
