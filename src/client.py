@@ -86,11 +86,19 @@ while True:
             continue
         else:
             msg = msg + ' ' + getpass.getpass(prompt='password:')
-            confirmaion = getpass.getpass(prompt='password confirm:')
-            if msg.split()[4] != confirmation:
+            confirmation = getpass.getpass(prompt='password confirm:')
+            if msg.split()[2] != confirmation:
                 print('ERROR: Your password and confirmation password do not match. Request has been ignored.')
                 sendable = False
                 continue
+
+            msg = msg + ' ' + getpass.getpass(prompt='new password:')
+            new_confirmation = getpass.getpass(prompt='new password confirm:')
+            if msg.split()[3] != new_confirmation:
+                print('ERROR: New password and confirmation password do not match. Request has been ignored.')
+                sendable = False
+                continue
+                
 
     if sendable:
         encrypt_send( (current_key + ' ' + msg), u_publicKey, client)
