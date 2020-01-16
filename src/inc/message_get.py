@@ -141,6 +141,9 @@ def get_file(key, person, file_path, conn, symmetricKey):
                     tmp['content'] = '[received]' + file_path
                     file_found = True
             fp.close()
+            with open(gen_path(current_account, person, '.json'), 'w') as fp:
+                json.dump(data, fp)
+                fp.close()
 
         if file_found:
 
@@ -164,6 +167,8 @@ def get_file(key, person, file_path, conn, symmetricKey):
                     conn.send(buf)
                     #encrypt_send_byte( buf, symmetricKey, conn)
                 fp.close()
+
+            os.remove(gen_path(current_account, person, '/' + file_path))
 
             return 'done'
 

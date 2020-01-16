@@ -164,7 +164,7 @@ while True:
                         if not os.path.isfile(save_path):
                             break;
                         save_path = msg.split()[ic].split('.')[0] \
-                                + '(' + str(index) + ').' + msg.split()[ic].split('.')[1]
+                                + '_' + str(index) + msg.split()[ic].split('.')[1]
 
                     encrypt_send( ('ok'), symmetricKey, client)
                     bound = int(buf.split()[1])
