@@ -134,7 +134,11 @@ while True:
                                 tmp = receive_decode( symmetricKey, client, max_length)
                                 is_end  = False
                                 for k in tmp.split():
+                                    if k == 'done':
+                                        is_end = True
+                                        break
                                     if int(k) == bound:
+                                        buf = receive_decode( symmetricKey, client, max_length)
                                         is_end = True
                                         break
                                 if is_end:
@@ -143,7 +147,6 @@ while True:
                                 client.send(buf)
                                 #encrypt_send_byte( buf, symmetricKey, client)
                         fp.close()
-                    buf = receive_decode( symmetricKey, client, max_length)
                     if ic != len(msg.split())-1:
                         encrypt_send( ('next'), symmetricKey, client)
                     print(buf)
