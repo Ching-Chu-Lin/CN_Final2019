@@ -4,6 +4,7 @@ import json
 import prettytable as pt
 
 from .account import md5_encode
+from inc.cryptography import *
 
 def gen_path(a, b, c):
     buf = os.getcwd() + '/data/' + a + '/' + b + c
@@ -113,7 +114,7 @@ def get_text(key, person, search):
         else:
             return 'person not found'
 
-def get_file(key, person, file_path, conn):
+def get_file(key, person, file_path, conn, symmetricKey):
 
     max_length = 4096
     current_account = ''
@@ -144,13 +145,13 @@ def get_file(key, person, file_path, conn):
         if file_found:
 
             bound = int(os.path.getsize(gen_path(current_account, person, '/' + file_path)))
-            conn.send(('ok ' + str(bound)).encode())
-            tmp = (conn.recv(max_length)).decode()
+            encrypt_send( ('ok ' + str(bound)), symmetricKey, conn)
+            tmp = receive_decode( symmetricKey, conn, max_length)
             with open(gen_path(current_account, person, '/' + file_path), 'rb') as fp:
                 buf = fp.read(max_length)
-                conn.send(buf)
+                encrypt_send_byte( buf, symmetricKey, conn)
                 while True:
-                    tmp = (conn.recv(max_length)).decode()
+                    tmp = receive_decode( symmetricKey, conn, max_length)
                     is_end  = False
                     for k in tmp.split():
                         if int(k) == bound:
@@ -159,17 +160,17 @@ def get_file(key, person, file_path, conn):
                     if is_end:
                         break
                     buf = fp.read(max_length)
-                    conn.send(buf)
+                    encrypt_send_byte( buf, symmetricKey, conn)
                 fp.close()
 
             return 'done'
 
         else:
-            conn.send(('error').encode())
+            encrypt_send( 'error', symmetricKey, conn)
             return 'file not found'
 
     else:
-        conn.send(('error').encode())
+        encrypt_send( 'error', symmetricKey, conn)
         if not authorized:
             return 'you have not logged in!'
         else:

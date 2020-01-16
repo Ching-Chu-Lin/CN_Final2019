@@ -7,6 +7,7 @@ import signal
 import socket
 import getpass
 import urllib.request
+from prettytable import PrettyTable
 from Crypto.Cipher import PKCS1_OAEP
 from cryptography.fernet import Fernet
 from Crypto.PublicKey import RSA
@@ -50,7 +51,7 @@ print('sym at client:', symmetricKey)
 
 
 while True:
-    
+
     print('>> ', end='')
     msg = input('')
 
@@ -63,7 +64,7 @@ while True:
 
     while network_availability == False:
         try:
-            #urllib.request.urlopen('https://google.com')
+            urllib.request.urlopen('https://google.com')
             network_availability = True
         except urllib.request.URLError as err:
             print('network is unreachable...')
@@ -107,7 +108,7 @@ while True:
                 print('ERROR: New password and confirmation password do not match. Request has been ignored.')
                 sendable = False
                 continue
-                
+
 
     if sendable:
         encrypt_send( (current_key + ' ' + msg), symmetricKey, client)
@@ -126,12 +127,12 @@ while True:
                 if os.path.isfile(msg.split()[ic]):
                     buf = receive_decode( symmetricKey, client, max_length)
                     bound = int(os.path.getsize(msg.split()[ic]))
-                    encrypt_send( ('ok' + str(bound)), symmetricKey, client)
+                    encrypt_send( ('ok ' + str(bound)), symmetricKey, client)
                     with open(msg.split()[ic], 'rb') as fp:
                         buf = receive_decode( symmetricKey, client, max_length)
                         if buf == 'ok':
                             buf = fp.read(max_length)
-                            encrypte_send( buf, symmetricKey, client)
+                            encrypt_send_byte( buf, symmetricKey, client)
                             for j in range(bound):
                                 tmp = receive_decode( symmetricKey, client, max_length)
                                 is_end  = False
@@ -143,16 +144,16 @@ while True:
                                 if is_end:
                                     break
                                 buf = fp.read(max_length)
-                                encrypte_send( buf, symmetricKey, client)
+                                encrypt_send_byte( buf, symmetricKey, client)
                         fp.close()
                     buf = receive_decode( symmetricKey, client, max_length)
                     if ic != len(msg.split())-1:
-                        encrypte_send( ('next'), symmetricKey, client)
+                        encrypt_send( ('next'), symmetricKey, client)
                     print(buf)
                 else:
                     if sendable:
                         buf = receive_decode( symmetricKey, client, max_length)
-                        encrypte_send( ('error'), symmetricKey, client)
+                        encrypt_send( ('error'), symmetricKey, client)
                     print(msg.split()[ic], ' not exists')
             continue
 
@@ -167,24 +168,24 @@ while True:
                             break;
                         save_path = msg.split()[ic].split('.')[0] \
                                 + '(' + str(index) + ').' + msg.split()[ic].split('.')[1]
-                        
-                    encrypte_send( ('ok'), symmetricKey, client)
+
+                    encrypt_send( ('ok'), symmetricKey, client)
                     bound = int(buf.split()[1])
                     size_sum = 0
                     with open(save_path, 'wb') as fp:
-                        buf = receive_decode( symmetricKey, client, max_length)
+                        buf = receive_decode_byte( symmetricKey, client, max_length)
                         size_sum += len(buf)
                         while True:
                             fp.write(buf)
-                            encrypte_send( (str(size_sum) + ' ' ), symmetricKey, client)
+                            encrypt_send( (str(size_sum) + ' ' ), symmetricKey, client)
                             if size_sum == bound:
                                 break
-                            buf = receive_decode( symmetricKey, client, max_length)
+                            buf = receive_decode_byte( symmetricKey, client, max_length)
                             size_sum += len(buf)
                         fp.close()
                 buf = receive_decode( symmetricKey, client, max_length)
                 if ic != len(msg.split())-1:
-                    encrypte_send( ('next'), symmetricKey, client)
+                    encrypt_send( ('next'), symmetricKey, client)
                 print(buf)
             continue
 
@@ -195,6 +196,6 @@ while True:
 
     print(buf)
 
-    
+
 
 client.close()

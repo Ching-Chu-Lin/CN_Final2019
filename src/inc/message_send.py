@@ -3,6 +3,8 @@ import sys
 import json
 import shutil
 
+from inc.cryptography import *
+
 def gen_path(a, b, c):
     buf = os.getcwd() + '/data/' + a + '/' + b + c
     return buf
@@ -85,7 +87,7 @@ def send_text(key, receiver, timestamp, content):
         else:
             return 'receiver not found'
 
-def send_file(key, receiver, timestamp, file_path, conn, bound):
+def send_file(key, receiver, timestamp, file_path, conn, bound, symmetricKey):
 
     max_length = 4096
     current_account = ''
@@ -104,7 +106,7 @@ def send_file(key, receiver, timestamp, file_path, conn, bound):
 
     if authorized and receiver_found:
 
-        conn.send(('ok').encode())
+        encrypt_send('ok', symmetricKey, conn)
 
         if not os.path.exists(gen_path(receiver, current_account, '/')):
             os.mkdir(gen_path(receiver, current_account, '/'))
@@ -118,14 +120,15 @@ def send_file(key, receiver, timestamp, file_path, conn, bound):
 
         size_sum = 0
         with open(gen_path(receiver, current_account, '/'+file_path), 'wb') as fp:
-            buf = conn.recv(max_length)
+            buf = receive_decode_byte(symmetricKey, conn, max_length)
             size_sum += len(buf)
+            print('Bound: ', bound)
             while True:
                 fp.write(buf)
-                conn.send((str(size_sum) + ' ').encode())
+                encrypt_send((str(size_sum) + ' '), symmetricKey, conn)
                 if size_sum == bound:
                     break
-                buf = conn.recv(max_length)
+                buf = receive_decode_byte(symmetricKey, conn, max_length)
                 size_sum += len(buf)
             fp.close()
 
@@ -141,7 +144,7 @@ def send_file(key, receiver, timestamp, file_path, conn, bound):
 
     else:
 
-        conn.send(('error').encode())
+        encrypt_send(('error'), symmetricKey, conn)
 
         if not authorized:
             return 'you have not logged in!'

@@ -102,7 +102,7 @@ while True:
                             encrypt_send( ('ok'), symmetricKey, conn)
                             tmp = ( receive_decode( symmetricKey, conn, max_length))
                             if tmp.split()[0] == 'ok':
-                                msg = send_file(buf.split()[0], buf.split()[3], str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), shlex.split(buf)[ic], conn, int(tmp.split()[1]))
+                                msg = send_file(buf.split()[0], buf.split()[3], str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), shlex.split(buf)[ic], conn, int(tmp.split()[1]), symmetricKey)
                                 print('msg:\n', msg)
                                 encrypt_send( msg, symmetricKey, conn)
                                 if ic != len(shlex.split(buf))-1:
@@ -116,7 +116,7 @@ while True:
                         msg = get_text(buf.split()[0], buf.split()[3], buf.split()[4])
                     else:
                         for ic in range(4, len(buf.split()), 1):
-                            msg = get_file(buf.split()[0], buf.split()[3], buf.split()[ic], conn)
+                            msg = get_file(buf.split()[0], buf.split()[3], buf.split()[ic], conn, symmetricKey)
                             print('msg:\n', msg)
                             encrypt_send( msg, symmetricKey, conn)
                             if ic != len(buf.split())-1:
