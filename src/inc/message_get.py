@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import prettytable as pt
 
 from .account import md5_encode
 
@@ -22,23 +23,26 @@ def show_all(key):
                 authorized = True
         fp.close()
     if authorized:
+        ret = pt.PrettyTable()
+        ret.field_names = ['User', 'Sender', 'Time', 'Status', 'Message']
         for f in os.listdir(gen_path(current_account, '', '')):
             print(f)
             if f.endswith(".json"):
                 with open(gen_path(current_account, f, ''), 'r') as fp:
                     data = json.load(fp)
-                    length = len(data['message'])
-                    tmp = data['message'][length-1]
-                    ret = ret + f.split('.')[0] + ' '
-                    ret = ret + '[' + tmp['direction'] + '] '
-                    ret = ret + tmp['timestamp'] + ' '
-                    if tmp['read']:
-                        ret = ret + '( read ):' + ' '
-                    else:
-                        ret = ret + '(unread):' + ' '
-                    ret = ret + tmp['content'] + '\n'
                     fp.close()
-        return ret
+                    tmp = data['message'][len(data['message'])-1]
+                    arr = []
+                    arr.append(f.split('.')[0])
+                    arr.append(tmp['direction'])
+                    arr.append(tmp['timestamp'])
+                    if tmp['read']:
+                        arr.append('( read )')
+                    else:
+                        arr.append('(unread)')
+                    arr.append(tmp['content'])
+                    ret.add_row(arr)
+        return ret.get_string()
     else:
         return 'you have not logged in!'
 
@@ -67,21 +71,24 @@ def get_text(key, person, search):
         if search == 'all':
             search = ''
 
-        buf = 'Message History:\n'
+        ret = pt.PrettyTable()
+        ret.field_names = ['Sender', 'Time', 'Status', 'Message']
         with open(gen_path(current_account, person, '.json'), 'r') as fp:
             data = json.load(fp)
+            fp.close()
             for tmp in data['message']:
+                arr = []
                 if tmp['content'].find(search) != -1:
-                    buf = buf + '[' + tmp['direction'] + '] '
-                    buf = buf + tmp['timestamp'] + ' '
+                    arr.append(tmp['direction'])
+                    arr.append(tmp['timestamp'])
                     if tmp['read'] == True:
-                        buf = buf + '( read ):'
+                        arr.append('( read )')
                     else:
-                        buf = buf + '(unread):'
-                    buf = buf + tmp['content'] + '\n'
+                        arr.append('(unread)')
+                    arr.append(tmp['content'])
+                    ret.add_row(arr)
                     if tmp['direction'] == ' in ' or tmp['direction'] == 'self':
                         tmp['read'] = True
-            fp.close()
 
         with open(gen_path(current_account, person, '.json'), 'w') as fp:
             json.dump(data, fp)
@@ -98,7 +105,7 @@ def get_text(key, person, search):
             json.dump(data, fp)
             fp.close()
 
-        return buf
+        return ret.get_string()
 
     else:
         if not authorized:
