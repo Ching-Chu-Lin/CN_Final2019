@@ -18,7 +18,7 @@ def receive_decode( Key, conn, max_length): #me_privateKey
     cipher = Fernet( Key)
     data = conn.recv( max_length)
     decrypted = cipher.decrypt( data).decode()
-    
+
     return decrypted
 
 def encrypt_send( string, Key, conn): #u_publicKey
@@ -31,6 +31,18 @@ def encrypt_send( string, Key, conn): #u_publicKey
     encrypted = cipher.encrypt( string.encode())
     conn.send( encrypted)
 
+    return
+
+def receive_decode_byte( Key, conn, max_length):
+    cipher = Fernet( Key)
+    data = conn.recv( max_length)
+    decrypted = cipher.decrypt( data)
+    return decrypted
+
+def encrypt_send_byte( string, Key, conn):
+    cipher = Fernet( Key)
+    encrypted = cipher.encrypt( string)
+    conn.send( encrypted)
     return
 
 
