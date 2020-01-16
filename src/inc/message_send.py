@@ -115,7 +115,7 @@ def send_file(key, receiver, timestamp, file_path, conn, bound, symmetricKey):
             for ic in range(1, 65536, 1):
                 if not os.path.isfile(gen_path(receiver, current_account,
                     '/'+file_path.split('.')[0]+'('+str(ic)+').'+file_path.split('.')[1])):
-                    file_path = file_path.split('.')[0]+'('+str(ic)+').'+file_path.split('.')[1]
+                    file_path = file_path.split('.')[0]+'_'+str(ic)+'.'+file_path.split('.')[1]
                     break
 
         size_sum = 0
