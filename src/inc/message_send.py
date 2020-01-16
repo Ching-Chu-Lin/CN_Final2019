@@ -120,7 +120,8 @@ def send_file(key, receiver, timestamp, file_path, conn, bound, symmetricKey):
 
         size_sum = 0
         with open(gen_path(receiver, current_account, '/'+file_path), 'wb') as fp:
-            buf = receive_decode_byte(symmetricKey, conn, max_length)
+            buf = conn.recv(max_length)
+            #buf = receive_decode_byte(symmetricKey, conn, max_length)
             size_sum += len(buf)
             print('Bound: ', bound)
             while True:
@@ -128,7 +129,8 @@ def send_file(key, receiver, timestamp, file_path, conn, bound, symmetricKey):
                 encrypt_send((str(size_sum) + ' '), symmetricKey, conn)
                 if size_sum == bound:
                     break
-                buf = receive_decode_byte(symmetricKey, conn, max_length)
+                buf = conn.recv(max_length)
+                #buf = receive_decode_byte(symmetricKey, conn, max_length)
                 size_sum += len(buf)
             fp.close()
 

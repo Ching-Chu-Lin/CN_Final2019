@@ -149,7 +149,8 @@ def get_file(key, person, file_path, conn, symmetricKey):
             tmp = receive_decode( symmetricKey, conn, max_length)
             with open(gen_path(current_account, person, '/' + file_path), 'rb') as fp:
                 buf = fp.read(max_length)
-                encrypt_send_byte( buf, symmetricKey, conn)
+                conn.send(buf)
+                #encrypt_send_byte( buf, symmetricKey, conn)
                 while True:
                     tmp = receive_decode( symmetricKey, conn, max_length)
                     is_end  = False
@@ -160,7 +161,8 @@ def get_file(key, person, file_path, conn, symmetricKey):
                     if is_end:
                         break
                     buf = fp.read(max_length)
-                    encrypt_send_byte( buf, symmetricKey, conn)
+                    conn.send(buf)
+                    #encrypt_send_byte( buf, symmetricKey, conn)
                 fp.close()
 
             return 'done'

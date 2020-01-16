@@ -14,7 +14,7 @@ from Crypto.PublicKey import RSA
 
 from inc.cryptography import *
 
-server_ip = '127.0.0.1'
+server_ip = '140.112.30.125'
 port = 12789
 max_length = 4096
 wait_second = 10
@@ -46,9 +46,6 @@ cipher = PKCS1_OAEP.new( u_publicKey)
 encrypted = cipher.encrypt( symmetricKey)
 client.send( encrypted)
 print('sym at client:', symmetricKey)
-
-
-
 
 while True:
 
@@ -131,19 +128,20 @@ while True:
                         buf = receive_decode( symmetricKey, client, max_length)
                         if buf == 'ok':
                             buf = fp.read(max_length)
-                            encrypt_send_byte( buf, symmetricKey, client)
+                            client.send(buf)
+                            #encrypt_send_byte( buf, symmetricKey, client)
                             for j in range(bound):
                                 tmp = receive_decode( symmetricKey, client, max_length)
                                 is_end  = False
                                 for k in tmp.split():
-                                    print(k)
                                     if int(k) == bound:
                                         is_end = True
                                         break
                                 if is_end:
                                     break
                                 buf = fp.read(max_length)
-                                encrypt_send_byte( buf, symmetricKey, client)
+                                client.send(buf)
+                                #encrypt_send_byte( buf, symmetricKey, client)
                         fp.close()
                     buf = receive_decode( symmetricKey, client, max_length)
                     if ic != len(msg.split())-1:
@@ -172,14 +170,16 @@ while True:
                     bound = int(buf.split()[1])
                     size_sum = 0
                     with open(save_path, 'wb') as fp:
-                        buf = receive_decode_byte( symmetricKey, client, max_length)
+                        buf = client.recv(max_length)
+                        #buf = receive_decode_byte( symmetricKey, client, max_length)
                         size_sum += len(buf)
                         while True:
                             fp.write(buf)
                             encrypt_send( (str(size_sum) + ' ' ), symmetricKey, client)
                             if size_sum == bound:
                                 break
-                            buf = receive_decode_byte( symmetricKey, client, max_length)
+                            buf = client.recv(max_length)
+                            #buf = receive_decode_byte( symmetricKey, client, max_length)
                             size_sum += len(buf)
                         fp.close()
                 buf = receive_decode( symmetricKey, client, max_length)
