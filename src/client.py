@@ -55,10 +55,31 @@ while True:
     print('>> ', end='')
     msg = input('')
 
-    if msg.split()[0] == 'login':
-        print('Username:', end='')
+    if msg.split()[0] == 'reg':
+        print('Register\nUsername:', end='')
         msg = msg + ' ' + input('')
         msg = msg + ' ' + getpass.getpass(prompt='password:')
+
+    if msg.split()[0] == 'login':
+        print('Login\nUsername:', end='')
+        msg = msg + ' ' + input('')
+        msg = msg + ' ' + getpass.getpass(prompt='password:')
+
+    if msg.split()[0] == 'chg':
+        if len(msg.split()) != 2:
+            print('Usage: [chg] [account]')
+            sendable = False
+            continue
+        else:
+            print('Change Password\n')
+            msg = msg + ' ' + getpass.getpass(prompt='password:')
+
+            msg = msg + ' ' + getpass.getpass(prompt='new password:')
+            new_confirmation = getpass.getpass(prompt='new password confirm:')
+            if msg.split()[3] != new_confirmation:
+                print('ERROR: New password and confirmation password do not match. Request has been ignored.')
+                sendable = False
+                continue
 
     network_availability = False
 
@@ -87,28 +108,6 @@ while True:
         if len(msg.split()) < 4:
             print('Usage: [get] [text or file] [person] [content]')
             continue
-
-
-    if msg.split()[0] == 'chg':
-        if len(msg.split()) != 2:
-            print('Usage: [chg] [account]')
-            sendable = False
-            continue
-        else:
-            msg = msg + ' ' + getpass.getpass(prompt='password:')
-            confirmation = getpass.getpass(prompt='password confirm:')
-            if msg.split()[2] != confirmation:
-                print('ERROR: Your password and confirmation password do not match. Request has been ignored.')
-                sendable = False
-                continue
-
-            msg = msg + ' ' + getpass.getpass(prompt='new password:')
-            new_confirmation = getpass.getpass(prompt='new password confirm:')
-            if msg.split()[3] != new_confirmation:
-                print('ERROR: New password and confirmation password do not match. Request has been ignored.')
-                sendable = False
-                continue
-
 
     if sendable:
         encrypt_send( (current_key + ' ' + msg), symmetricKey, client)
