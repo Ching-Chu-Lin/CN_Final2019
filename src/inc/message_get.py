@@ -42,7 +42,7 @@ def show_all(key):
                         arr.append('(unread)')
                     arr.append(tmp['content'])
                     ret.add_row(arr)
-        return ret.get_string()
+        return ret.get_string(sortby="Time", reversesort=True)
     else:
         return 'you have not logged in!'
 
@@ -105,7 +105,7 @@ def get_text(key, person, search):
             json.dump(data, fp)
             fp.close()
 
-        return ret.get_string()
+        return ret.get_string(sortby="Time", reversesort=True)
 
     else:
         if not authorized:
