@@ -48,6 +48,9 @@ password:[password]
 # Logout
 logout
 
+# Change Font Color
+color [grey/red/green/yellow/blue/magenta/cyan/white]
+
 # Show all Record
 show
 

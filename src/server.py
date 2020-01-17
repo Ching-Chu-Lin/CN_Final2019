@@ -12,6 +12,7 @@ from inc.account import create_user
 from inc.account import change_password
 from inc.account import log_in
 from inc.account import log_out
+from inc.account import chgcolor
 from inc.message_send import send_text
 from inc.message_send import send_file
 from inc.message_get import show_all
@@ -122,6 +123,11 @@ while True:
                             if ic != len(buf.split())-1:
                                 tmp = ( receive_decode( symmetricKey, conn, max_length))
                         continue
+            elif buf.split()[1] == 'color':
+                if len(buf.split()) < 3:
+                    msg = 'Usage: [color] [grey/red/green/yellow/blue/magenta/cyan/white]'
+                else:
+                    msg = chgcolor(buf.split()[0],buf.split()[2])
             else:
                 msg = 'Error: undefined command!'
 

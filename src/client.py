@@ -7,6 +7,7 @@ import signal
 import socket
 import getpass
 import urllib.request
+from termcolor import colored, cprint
 from prettytable import PrettyTable
 from Crypto.Cipher import PKCS1_OAEP
 from cryptography.fernet import Fernet
@@ -14,7 +15,7 @@ from Crypto.PublicKey import RSA
 
 from inc.cryptography import *
 
-server_ip = '140.112.30.125'
+server_ip = '10.5.4.170'
 port = 12789
 max_length = 4096
 wait_second = 10
@@ -27,6 +28,7 @@ except:
     exit(0)
 
 current_key = 'none'
+current_color='grey'
 
 def signal_handler(sig, frame):
         encrypt_send( (current_key + ' logout'), symmetricKey, client)
@@ -104,13 +106,26 @@ while True:
     if current_key == 'none' and (msg.split()[0] != 'login' \
                                   and msg.split()[0] != 'exit' \
                                   and msg.split()[0] != 'reg' \
-                                  and msg.split()[0] != 'chg'):
+                                  and msg.split()[0] != 'chg'\
+                                  ):
         print('you have not logged in!')
         continue
 
+    validcolor=0
+    colorlist=['grey','red','green','yellow','blue','magenta','cyan','white']
+    if msg.split()[0] =='color':
+        for choice in colorlist:
+            if msg.split()[1]==choice:
+                validcolor=1
+                current_color=msg.split()[1]
+                break
+        if validcolor==0:
+            print('invalid color!!')
+            continue
+
     if msg.split()[0] == 'get':
         if len(msg.split()) < 4:
-            print('Usage: [get] [text or file] [person] [content]')
+            cprint('Usage: [get] [text or file] [person] [content]',current_color)
             continue
 
     if sendable:
@@ -123,6 +138,7 @@ while True:
 
     elif msg.split()[0] == 'logout':
         current_key = 'none'
+        current_color='grey'
 
     elif msg.split()[0] == 'send' and (len(msg.split()) >= 2):
         if msg.split()[1] == 'file':
@@ -157,12 +173,12 @@ while True:
                         fp.close()
                     if ic != len(msg.split())-1:
                         encrypt_send( ('next'), symmetricKey, client)
-                    print(buf)
+                    cprint(buf,current_color)
                 else:
                     if sendable:
                         buf = receive_decode( symmetricKey, client, max_length)
                         encrypt_send( ('error'), symmetricKey, client)
-                    print(msg.split()[ic], ' not exists')
+                    cprint(msg.split()[ic]+' not exists',current_color)
             continue
 
     elif msg.split()[0] == 'get' and (len(msg.split()) >= 2):
@@ -196,15 +212,20 @@ while True:
                 buf = receive_decode( symmetricKey, client, max_length)
                 if ic != len(msg.split())-1:
                     encrypt_send( ('next'), symmetricKey, client)
-                print(buf)
+                cprint(buf,current_color)
             continue
+    if msg.split()[0] == 'login':
+        buf = receive_decode( symmetricKey, client, max_length)
+        current_color =buf.split('/')[1]
+        buf=buf.split('/')[0]
 
-    buf = receive_decode( symmetricKey, client, max_length)
+    else:
+        buf = receive_decode( symmetricKey, client, max_length)
 
     if msg.split()[0] == 'login' and len(buf) == 32:
         current_key = buf
 
-    print(buf)
+    cprint(buf,current_color)
 
 
 

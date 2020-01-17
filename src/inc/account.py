@@ -33,7 +33,8 @@ def create_user(account, password):
             'account': account,
             'password': md5_encode(password),
             'key': '',
-            'online': False
+            'online': False,
+            'color':'blue'
         })
 
         with open(os.getcwd() + '/data/user.json', 'w') as fp:
@@ -91,6 +92,7 @@ def log_in(account, password):
                 tmp['key'] = key
                 tmp['online'] = True
                 authorized = True
+                color = tmp['color']
                 break
         fp.close()
 
@@ -100,13 +102,24 @@ def log_in(account, password):
             json.dump(data, fp)
             fp.close()
 
-        return key
+        return key+'/'+color
 
     else:
         return 'wrong account or password'
 
-def log_out(key):
+def chgcolor(key,color):
+    with open(os.getcwd() + '/data/user.json', 'r') as fp:
+        data = json.load(fp)
+        for tmp in data['user']:
+            if tmp['key'] == key:
+                tmp['color'] = color
+        fp.close()
+    with open(os.getcwd() + '/data/user.json', 'w') as fp:
+            json.dump(data, fp)
+            fp.close()
+    return 'done'
 
+def log_out(key):
     with open(os.getcwd() + '/data/user.json', 'r') as fp:
         data = json.load(fp)
         for tmp in data['user']:
