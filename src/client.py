@@ -14,7 +14,7 @@ from Crypto.PublicKey import RSA
 
 from inc.cryptography import *
 
-server_ip = '127.0.0.1'
+server_ip = '140.112.30.125'
 port = 12789
 max_length = 4096
 wait_second = 10
