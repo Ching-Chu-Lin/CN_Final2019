@@ -142,7 +142,7 @@ while True:
 
     elif msg.split()[0] == 'logout':
         current_key = 'none'
-        current_color='grey'
+        current_color='white'
 
     elif msg.split()[0] == 'send' and (len(msg.split()) >= 2):
         if msg.split()[1] == 'file':
