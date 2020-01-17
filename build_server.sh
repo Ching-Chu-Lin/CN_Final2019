@@ -5,7 +5,7 @@ if [ ! -d env-server/ ]; then
     unzip env-server.zip; rm -rf env-server.zip
     source env-server/bin/activate
 else
-	source env/bin/activate
+    source env-server/bin/activate
 fi
 
 python3 server.py
