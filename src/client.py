@@ -53,6 +53,9 @@ while True:
     cprint('>> ', current_color, end='')
     msg = input('')
 
+    if msg == '':
+        continue
+
     if msg.split()[0] == 'reg':
         print('Register\nUsername:', end='')
         msg = msg + ' ' + input('')
@@ -92,8 +95,6 @@ while True:
             cprint('......', current_color)
 
     sendable = True
-    if msg == '':
-        continue
 
     if msg.split()[0] == 'send' and len(msg.split()) >= 4:
         if msg.split()[1] == 'file':
