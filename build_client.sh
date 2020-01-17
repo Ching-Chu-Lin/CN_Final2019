@@ -1,10 +1,10 @@
 #!/bin/sh
 cd src
-if [ ! -f testdata/ ]; then
+if [ ! -d testdata/ ]; then
     wget http://csie.ntu.edu.tw/~b08902009/cn_testdata.zip
     unzip cn_testdata.zip; rm -rf cn_testdata.zip
 fi
-if [ ! -f env/ ]; then
+if [ ! -d env/ ]; then
     wget http://csie.ntu.edu.tw/~b08902009/env.zip
     unzip env.zip; rm -rf env.zip
 fi
