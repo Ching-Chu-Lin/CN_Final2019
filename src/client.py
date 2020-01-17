@@ -82,7 +82,7 @@ while True:
 
     while network_availability == False:
         try:
-            #urllib.request.urlopen('https://google.com')
+            urllib.request.urlopen('https://google.com')
             network_availability = True
         except urllib.request.URLError as err:
             print('network is unreachable...')
@@ -100,6 +100,10 @@ while True:
             for ic in range(3, len(msg.split()), 1):
                 if os.path.isfile(msg.split()[ic]):
                     sendable = True
+    
+    if current_key == 'none' and (msg.split()[0] != 'login' and msg.split()[0] != 'exit'):
+        print('you have not logged in!')
+        continue
 
     if msg.split()[0] == 'get':
         if len(msg.split()) < 4:
