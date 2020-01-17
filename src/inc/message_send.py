@@ -110,7 +110,7 @@ def send_file(key, receiver, timestamp, file_path, conn, bound, symmetricKey):
 
         if not os.path.exists(gen_path(receiver, current_account, '/')):
             os.mkdir(gen_path(receiver, current_account, '/'))
-
+        file_path=file_path.split('/')[-1]
         if os.path.isfile(gen_path(receiver, current_account, '/'+file_path)):
             for ic in range(1, 65536, 1):
                 if not os.path.isfile(gen_path(receiver, current_account,
