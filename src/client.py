@@ -19,16 +19,15 @@ server_ip = '140.112.30.125'
 port = 12789
 max_length = 4096
 wait_second = 10
+current_key = 'none'
+current_color='white'
 
 client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 try:
     client.connect((server_ip, port))
 except:
-    print('network is unreachable')
+    cprint('network is unreachable', current_color)
     exit(0)
-
-current_key = 'none'
-current_color='grey'
 
 def signal_handler(sig, frame):
         encrypt_send( (current_key + ' logout'), symmetricKey, client)
@@ -47,11 +46,11 @@ symmetricKey = Fernet.generate_key()
 cipher = PKCS1_OAEP.new( u_publicKey)
 encrypted = cipher.encrypt( symmetricKey)
 client.send( encrypted)
-print('sym at client:', symmetricKey)
+#print('sym at client:', symmetricKey)
 
 while True:
 
-    print('>> ', end='')
+    cprint('>> ', current_color, end='')
     msg = input('')
 
     if msg.split()[0] == 'reg':
@@ -87,10 +86,10 @@ while True:
             urllib.request.urlopen('https://google.com')
             network_availability = True
         except urllib.request.URLError as err:
-            print('network is unreachable...')
+            cprint('network is unreachable...', current_color)
             network_availability = False
             time.sleep(wait_second)
-            print('......')
+            cprint('......', current_color)
 
     sendable = True
     if msg == '':
@@ -108,19 +107,23 @@ while True:
                                   and msg.split()[0] != 'reg' \
                                   and msg.split()[0] != 'chg'\
                                   ):
-        print('you have not logged in!')
+        cprint('you have not logged in!', current_color)
         continue
 
     validcolor=0
     colorlist=['grey','red','green','yellow','blue','magenta','cyan','white']
     if msg.split()[0] =='color':
+        if len(msg.split())< 2:
+            sendable = False
+            cprint('Usage: [color] [choice]', current_color)
+            continue
         for choice in colorlist:
             if msg.split()[1]==choice:
                 validcolor=1
                 current_color=msg.split()[1]
                 break
         if validcolor==0:
-            print('invalid color!!')
+            cprint('invalid color!!', current_color)
             continue
 
     if msg.split()[0] == 'get':
@@ -132,7 +135,7 @@ while True:
         encrypt_send( (current_key + ' ' + msg), symmetricKey, client)
 
     if msg.split()[0] == 'exit':
-        print('bye')
+        cprint('bye', current_color)
         break
 
 
@@ -226,7 +229,5 @@ while True:
         current_key = buf
 
     cprint(buf,current_color)
-
-
 
 client.close()
