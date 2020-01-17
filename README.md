@@ -8,7 +8,7 @@ For the setup:
 
 ```bash
 git clone https://github.com/Ching-Chu-Lin/CN_Final2019.git 
-cd 2019_CN_Final/
+cd CN_Final2019/
 ```
 
 Run on Server:
