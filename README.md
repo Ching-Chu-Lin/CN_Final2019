@@ -26,36 +26,81 @@ Run on Client:
 Usage:
 
 ```bash
-#Account
-reg [account] [password]
-chg [account] [pasword] [new password]
-login [account] [password]
+# Register
+>> reg
+Register
+Username:[username]
+password:[password]
+
+# Change Password
+>> chg admin
+Change Password
+password:[old password]
+new password:[new password]
+new password confirm:[confirm]
+
+# Login
+>> login
+Login
+Username:[username]
+password:[password]
+
+# Logout
 logout
-#List
+
+# Show all Record
 show
-#Send
+
+# Send Messages
 send [text] [receiver] [content]
 send [file] [receiver] [[content1] [content2]...] # available when receiver online
-#Get
+
+# Receive Messages
 get [text or file] [person] [content]
-#Exit
+
+# Exit
 exit
 ```
 
 ### Sample
 
 ```bash
->> reg test test
+$ ./build_client.sh
+sym at client: b'UG_FihMm0r_qn-bwi0-HPKzxjVi0LVpCv2saBuYy6b8='
+>> reg
+Register
+Username:demo
+password:
 done
->> login test test
-2cf22a2d436117649286ebafe915c624
->> send text admin "Hello I am test"               
+>> login
+Login
+Username:demo
+password:
+71f351649b62a110b442033f9f315f20
+>> send text admin "I am demo"
 done
->> get text admin all
-Message History:
-[out ] 2019-12-25 15:33:56 (unread):Hello I am test
->>  logout
-you have logged out
+>> send text demo "I am you"
+done
+>> send file demo ccf_pub.txt
+done
+>> show
++-------+---------------------+----------+-------------------+-----------+
+|  User |         Time        |  Status  |      Message      | Direction |
++-------+---------------------+----------+-------------------+-----------+
+|  demo | 2020-01-17 22:12:51 | (unread) | [file]ccf_pub.txt |    self   |
+| admin | 2020-01-17 22:12:27 | (unread) |     I am demo     |    out    |
++-------+---------------------+----------+-------------------+-----------+
+>> get text demo all
++---------------------+----------+-------------------+-----------+
+|         Time        |  Status  |      Message      | Direction |
++---------------------+----------+-------------------+-----------+
+| 2020-01-17 22:12:51 | (unread) | [file]ccf_pub.txt |    self   |
+| 2020-01-17 22:12:39 | (unread) |      I am you     |    self   |
++---------------------+----------+-------------------+-----------+
+>> get file demo ccf_pub.txt
+done
+>> exit
+bye
 ```
 
 ### Feature
