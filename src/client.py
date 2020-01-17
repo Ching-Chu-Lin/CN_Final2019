@@ -174,6 +174,8 @@ while True:
                                 buf = fp.read(max_length)
                                 client.sendall(buf)
                                 #encrypt_send_byte( buf, symmetricKey, client)
+                        else:
+                            buf = receive_decode( symmetricKey, client, max_length)
                         fp.close()
                     if ic != len(msg.split())-1:
                         encrypt_send( ('next'), symmetricKey, client)
