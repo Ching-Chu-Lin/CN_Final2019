@@ -14,7 +14,7 @@ from Crypto.PublicKey import RSA
 
 from inc.cryptography import *
 
-server_ip = '140.112.30.125'
+server_ip = '127.0.0.1'
 port = 12789
 max_length = 4096
 wait_second = 10
@@ -82,7 +82,7 @@ while True:
 
     while network_availability == False:
         try:
-            urllib.request.urlopen('https://google.com')
+            #urllib.request.urlopen('https://google.com')
             network_availability = True
         except urllib.request.URLError as err:
             print('network is unreachable...')

@@ -4,7 +4,7 @@ from Crypto.PublicKey import RSA
 
 def asymmetric_key_generation():
     #Generate private and public keys
-    random_generator = Random.new().read
+    random_generator = Random.atfork()
     private_key = RSA.generate(1024, random_generator)
     public_key = private_key.publickey()
 
