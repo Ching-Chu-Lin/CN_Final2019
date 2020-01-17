@@ -25,7 +25,7 @@ def show_all(key):
         fp.close()
     if authorized:
         ret = pt.PrettyTable()
-        ret.field_names = ['User', 'Sender', 'Time', 'Status', 'Message']
+        ret.field_names = ['User', 'Time', 'Status', 'Message', 'Direction']
         for f in os.listdir(gen_path(current_account, '', '')):
             print(f)
             if f.endswith(".json"):
@@ -35,13 +35,13 @@ def show_all(key):
                     tmp = data['message'][len(data['message'])-1]
                     arr = []
                     arr.append(f.split('.')[0])
-                    arr.append(tmp['direction'])
                     arr.append(tmp['timestamp'])
                     if tmp['read']:
                         arr.append('( read )')
                     else:
                         arr.append('(unread)')
                     arr.append(tmp['content'])
+                    arr.append(tmp['direction'])
                     ret.add_row(arr)
         return ret.get_string(sortby="Time", reversesort=True)
     else:
@@ -73,20 +73,20 @@ def get_text(key, person, search):
             search = ''
 
         ret = pt.PrettyTable()
-        ret.field_names = ['Sender', 'Time', 'Status', 'Message']
+        ret.field_names = ['Time', 'Status', 'Message', 'Direction']
         with open(gen_path(current_account, person, '.json'), 'r') as fp:
             data = json.load(fp)
             fp.close()
             for tmp in data['message']:
                 arr = []
                 if tmp['content'].find(search) != -1:
-                    arr.append(tmp['direction'])
                     arr.append(tmp['timestamp'])
                     if tmp['read'] == True:
                         arr.append('( read )')
                     else:
                         arr.append('(unread)')
                     arr.append(tmp['content'])
+                    arr.append(tmp['direction'])
                     ret.add_row(arr)
                     if tmp['direction'] == ' in ' or tmp['direction'] == 'self':
                         tmp['read'] = True
@@ -152,7 +152,7 @@ def get_file(key, person, file_path, conn, symmetricKey):
             tmp = receive_decode( symmetricKey, conn, max_length)
             with open(gen_path(current_account, person, '/' + file_path), 'rb') as fp:
                 buf = fp.read(max_length)
-                conn.send(buf)
+                conn.sendall(buf)
                 #encrypt_send_byte( buf, symmetricKey, conn)
                 while True:
                     tmp = receive_decode( symmetricKey, conn, max_length)
@@ -164,7 +164,7 @@ def get_file(key, person, file_path, conn, symmetricKey):
                     if is_end:
                         break
                     buf = fp.read(max_length)
-                    conn.send(buf)
+                    conn.sendall(buf)
                     #encrypt_send_byte( buf, symmetricKey, conn)
                 fp.close()
 
