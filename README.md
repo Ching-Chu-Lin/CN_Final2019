@@ -11,10 +11,16 @@ git clone https://github.com/Ching-Chu-Lin/CN_Final2019.git
 cd 2019_CN_Final/
 ```
 
-Run:
+Run on Server:
 
 ```bash
-python3 client.py
+./build_server.sh
+```
+
+Run on Client:
+
+```bash
+./build_client.sh
 ```
 
 Usage:
