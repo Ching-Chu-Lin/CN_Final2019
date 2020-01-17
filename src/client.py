@@ -100,8 +100,11 @@ while True:
             for ic in range(3, len(msg.split()), 1):
                 if os.path.isfile(msg.split()[ic]):
                     sendable = True
-    
-    if current_key == 'none' and (msg.split()[0] != 'login' and msg.split()[0] != 'exit'):
+
+    if current_key == 'none' and (msg.split()[0] != 'login' \
+                                  and msg.split()[0] != 'exit' \
+                                  and msg.split()[0] != 'reg' \
+                                  and msg.split()[0] != 'chg'):
         print('you have not logged in!')
         continue
 
