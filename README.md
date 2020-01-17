@@ -109,9 +109,10 @@ bye
 ### Feature
 
 * Auto Reconnect
-* Message Status
 * Change Password
-* Race Condition Avoid
-* Password hiding
-* List latest message for each user
+* Custom Style
 * Encryption
+* List Mainpage
+* Message Status
+* Password Hiding
+* Race Condition Avoid
