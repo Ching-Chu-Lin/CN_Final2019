@@ -1,2 +1,4 @@
 #!/bin/sh
-python3 src/server.py
+cd src
+source env/bin/activate
+python3 server.py
